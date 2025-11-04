@@ -1,28 +1,11 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {}
-  subscription_id = var.subscription_id
-}
-
-variable "subscription_id" {
-  type        = string
-  description = "Subscription ID to target."
-}
+# (Assumes versions.tf + providers.tf live in this folder for Terraform/azurerm setup.)
 
 variable "ai_webtest_alert" {
   type        = any
   description = "All settings for AI/WebTest/ActionGroup/Alert."
 }
 
-# Ensure the target RG exists (caller is responsible for it)
+# Ensure (or adopt) the target Resource Group
 resource "azurerm_resource_group" "monitoring" {
   name     = var.ai_webtest_alert.rg_name
   location = var.ai_webtest_alert.location
@@ -30,7 +13,7 @@ resource "azurerm_resource_group" "monitoring" {
 }
 
 module "ai_webtest_alert" {
-  source = "github.com/GoCHarrbra/ai-availability.git?ref=v0.7.0"
+  source = "github.com/GoCHarrbra/ai-availability.git?ref=v0.9.0"
 
   # Placement / naming
   rg_name         = azurerm_resource_group.monitoring.name
@@ -62,4 +45,13 @@ module "ai_webtest_alert" {
   # KQL + measure column
   kql_query          = var.ai_webtest_alert.kql_query
   kql_measure_column = var.ai_webtest_alert.kql_measure_column
+}
+
+# Useful outputs for downstream layers
+output "monitoring_rg_name" {
+  value = azurerm_resource_group.monitoring.name
+}
+
+output "web_test_name" {
+  value = var.ai_webtest_alert.web_test_name
 }
