@@ -2,10 +2,16 @@ subscription_id = "00000000-0000-0000-0000-000000000000"
 
 ai_webtest_alert = {
   # Where to put AI/WebTest/AG/Alert
-  rg_name     = "monitoring-dev-rg"
-  location    = "canadacentral"
+  rg_name  = "monitoring-dev-rg"
+  location = "canadacentral"
+
+  # Either supply resource_prefix for enforced naming (prefix-ai, prefix-ag, etc.)
+  # or rely on name_prefix/env/location below for AI/AG/Alert naming.
+  resource_prefix = "monitor"
+
   name_prefix = "tfhero"
   env         = "dev"
+
   tags = {
     created_by = "terraform"
     chapter    = "v30_ai_aca_availability"
@@ -39,7 +45,7 @@ ai_webtest_alert = {
   alert_severity                   = 0      # Sev0
   alert_failed_locations_threshold = 2      # 2-of-3
 
-  # KQL (keep the __WEB_TEST_NAME__ token; module will replace it with web_test_name)
+  # KQL (keep the __WEB_TEST_NAME__ token; module replaces it with web_test_name)
   kql_query = <<KQL
 AppAvailabilityResults
 | where Name == "__WEB_TEST_NAME__"
