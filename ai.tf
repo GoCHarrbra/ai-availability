@@ -1,5 +1,9 @@
+locals {
+  base_name = "${var.name_prefix}-${var.env}-${var.location}"
+}
+
 resource "azurerm_application_insights" "ai" {
-  name                        = "${var.name_prefix}-${var.env}-${var.location}-ai"
+  name                        = "${local.base_name}-ai"
   location                    = var.location
   resource_group_name         = var.rg_name
   application_type            = "web"

@@ -26,24 +26,32 @@ variable "law_name" {
   type = string
 }
 
-variable "backend_health_url" {
+variable "web_test_name" {
   type = string
 }
 
-variable "web_test_name" {
+variable "backend_health_url" {
   type = string
 }
 
 variable "web_test_frequency_seconds" {
   type = number
-  validation {
-    condition     = contains([300, 600, 900], var.web_test_frequency_seconds)
-    error_message = "web_test_frequency_seconds must be one of 300, 600, 900."
-  }
 }
 
 variable "web_test_geo_locations" {
   type = list(string)
+}
+
+variable "web_test_expected_status" {
+  type = number
+}
+
+variable "web_test_expect_text" {
+  type = string
+}
+
+variable "web_test_pass_if_text_found" {
+  type = bool
 }
 
 variable "alert_emails" {

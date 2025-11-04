@@ -1,5 +1,5 @@
 resource "azurerm_monitor_action_group" "ag" {
-  name                = "${var.name_prefix}-${var.env}-${var.location}-ag"
+  name                = "${local.base_name}-ag"
   resource_group_name = var.rg_name
   short_name          = "alerts"
   tags                = var.tags
