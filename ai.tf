@@ -1,4 +1,3 @@
-# Create workspace-based Application Insights
 resource "azurerm_application_insights" "ai" {
   name                        = "${var.name_prefix}-${var.env}-${var.location}-ai"
   location                    = var.location

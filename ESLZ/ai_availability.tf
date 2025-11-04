@@ -9,59 +9,153 @@ terraform {
 
 provider "azurerm" {
   features {}
-  # tfvars set the subid
   subscription_id = var.subscription_id
 }
 
-# Single object to keep caller clean
-variable "ai_webtest_alert" {
-  type = any
-}
+# -------------------------
+# Variables (multi-line)
+# -------------------------
 
-# Explicit subscription id (fed via tfvars)
 variable "subscription_id" {
   type = string
 }
 
-module "ai_webtest_alert" {
-  source = "github.com/0x4849/ai-availability.git?ref=v0.2.0"
-
-  # resource placement / naming
-  rg_name     = var.ai_webtest_alert.rg_name
-  location    = var.ai_webtest_alert.location
-  name_prefix = var.ai_webtest_alert.name_prefix
-  env         = var.ai_webtest_alert.env
-  tags        = var.ai_webtest_alert.tags
-
-  # existing LAW (reference only)
-  law_rg_name = var.ai_webtest_alert.law_rg_name
-  law_name    = var.ai_webtest_alert.law_name
-
-  # web test
-  backend_health_url         = var.ai_webtest_alert.backend_health_url
-  web_test_frequency_seconds = var.ai_webtest_alert.web_test_frequency_seconds
-  web_test_geo_locations     = var.ai_webtest_alert.web_test_geo_locations
-
-  # alerting
-  alert_emails                     = var.ai_webtest_alert.alert_emails
-  app_name                         = var.ai_webtest_alert.app_name
-  alert_severity                   = var.ai_webtest_alert.alert_severity
-  alert_failed_locations_threshold = var.ai_webtest_alert.alert_failed_locations_threshold
-
-  # KQL (must contain the literal token $${WEB_TEST_NAME})
-  kql_query = var.ai_webtest_alert.kql_query
+variable "rg_name" {
+  type = string
 }
 
-web_test_name = var.ai_webtest_alert.web_test_name
+variable "location" {
+  type = string
+}
 
-output "action_group_emails" {
-  value = module.ai_webtest_alert.action_group_emails
+variable "name_prefix" {
+  type = string
+}
+
+variable "env" {
+  type = string
+}
+
+variable "tags" {
+  type = map(string)
+}
+
+variable "law_rg_name" {
+  type = string
+}
+
+variable "law_name" {
+  type = string
+}
+
+variable "backend_health_url" {
+  type        = string
+  description = "Public health URL to probe, e.g. https://myapp/health"
+}
+
+variable "web_test_name" {
+  type        = string
+  description = "The exact AI Standard Web Test name. Your KQL should use this same value in Name == \"...\""
+}
+
+variable "web_test_frequency_seconds" {
+  type = number
+  validation {
+    condition     = contains([300, 600, 900], var.web_test_frequency_seconds)
+    error_message = "web_test_frequency_seconds must be one of 300, 600, 900."
+  }
+}
+
+variable "web_test_geo_locations" {
+  type        = list(string)
+  description = "Standard Web Test location IDs (e.g., us-va-ash-azr, us-ca-sjc-azr, emea-gb-db3-azr)"
+}
+
+variable "alert_emails" {
+  type        = list(string)
+  description = "List of email recipients for the Action Group."
+}
+
+variable "app_name" {
+  type = string
+}
+
+variable "alert_severity" {
+  type        = number
+  description = "0..4 (0 is Sev0)"
+}
+
+variable "alert_failed_locations_threshold" {
+  type        = number
+  description = "Alert when failed locations >= this threshold in the window."
+}
+
+variable "kql_query" {
+  type        = string
+  description = <<DESC
+KQL must produce exactly one numeric column with the name in kql_measure_column.
+Example:
+
+AppAvailabilityResults
+| where Name == "<your-web-test-name>"
+| where TimeGenerated > ago(5m)
+| summarize AggregatedValue = toreal(dcountif(Location, Success == false))
+| project AggregatedValue
+DESC
+}
+
+variable "kql_measure_column" {
+  type        = string
+  description = "The exact numeric column name that your KQL outputs (e.g., AggregatedValue)."
+}
+
+# -------------------------
+# Ensure target RG exists
+# -------------------------
+resource "azurerm_resource_group" "monitoring" {
+  name     = var.rg_name
+  location = var.location
+  tags     = var.tags
+}
+
+# -------------------------
+# Module call
+# -------------------------
+module "ai_webtest_alert" {
+  source = "github.com/0x4849/ai-availability.git?ref=v0.5.0"
+
+  rg_name     = azurerm_resource_group.monitoring.name
+  location    = var.location
+  name_prefix = var.name_prefix
+  env         = var.env
+  tags        = var.tags
+
+  law_rg_name = var.law_rg_name
+  law_name    = var.law_name
+
+  backend_health_url         = var.backend_health_url
+  web_test_name              = var.web_test_name
+  web_test_frequency_seconds = var.web_test_frequency_seconds
+  web_test_geo_locations     = var.web_test_geo_locations
+
+  alert_emails                     = var.alert_emails
+  app_name                         = var.app_name
+  alert_severity                   = var.alert_severity
+  alert_failed_locations_threshold = var.alert_failed_locations_threshold
+
+  kql_query          = var.kql_query
+  kql_measure_column = var.kql_measure_column
+}
+
+# Useful surface outputs
+output "web_test_name" {
+  value = module.ai_webtest_alert.web_test_name
+}
+
+output "action_group_id" {
+  value = module.ai_webtest_alert.action_group_id
 }
 
 output "kql_alert_name" {
   value = module.ai_webtest_alert.kql_alert_name
-}
-
-output "app_insights_name" {
-  value = module.ai_webtest_alert.app_insights_name
 }

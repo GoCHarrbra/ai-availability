@@ -1,5 +1,5 @@
 resource "azurerm_application_insights_standard_web_test" "health" {
-  name                    = coalesce(var.web_test_name, "${var.name_prefix}-${var.env}-${var.location}-health")
+  name                    = var.web_test_name
   location                = var.location
   resource_group_name     = var.rg_name
   application_insights_id = azurerm_application_insights.ai.id
@@ -21,7 +21,7 @@ resource "azurerm_application_insights_standard_web_test" "health" {
     content {
       content_match       = "healthy"
       ignore_case         = true
-      pass_if_text_found  = true
+      pass_if_text_found  = true   # IMPORTANT: ensures "healthy" means PASS
     }
   }
 
