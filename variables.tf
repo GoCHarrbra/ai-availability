@@ -28,17 +28,6 @@ variable "tags" {
   description = "Tags to apply to created resources."
 }
 
-# Existing LAW reference (must already exist)
-variable "law_rg_name" {
-  type        = string
-  description = "Resource group of existing Log Analytics Workspace."
-}
-
-variable "law_name" {
-  type        = string
-  description = "Name of existing Log Analytics Workspace."
-}
-
 # Web test config
 variable "web_test_name" {
   type        = string

@@ -4,7 +4,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "ai_availability_faile
   resource_group_name = var.rg_name
   location            = var.location
 
-  scopes                  = [data.azurerm_log_analytics_workspace.law.id]
+  scopes                  = [azurerm_log_analytics_workspace.law_app.id]
   description             = "Fatal Error: unable to reach ${var.app_name} health endpoint. Triggers if >= ${var.alert_failed_locations_threshold} locations fail in 5 minutes."
   enabled                 = true
   severity                = var.alert_severity
