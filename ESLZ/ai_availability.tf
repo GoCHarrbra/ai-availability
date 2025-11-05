@@ -13,7 +13,7 @@ resource "azurerm_resource_group" "monitoring" {
 }
 
 module "ai_webtest_alert" {
-  source = "github.com/GoCHarrbra/ai-availability.git?ref=v1.0.0"
+  source = "github.com/GoCHarrbra/ai-availability.git?ref=v0.9.0"
 
   # Placement / naming
   rg_name         = azurerm_resource_group.monitoring.name
@@ -22,6 +22,10 @@ module "ai_webtest_alert" {
   name_prefix     = var.ai_webtest_alert.name_prefix
   env             = var.ai_webtest_alert.env
   tags            = try(var.ai_webtest_alert.tags, {})
+
+  # Existing LAW (reference only)
+  law_rg_name = var.ai_webtest_alert.law_rg_name
+  law_name    = var.ai_webtest_alert.law_name
 
   # Web test config
   web_test_name               = var.ai_webtest_alert.web_test_name

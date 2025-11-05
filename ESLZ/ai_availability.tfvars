@@ -17,6 +17,10 @@ ai_webtest_alert = {
     chapter    = "v30_ai_aca_availability"
   }
 
+  # Existing LAW (must already exist)
+  law_rg_name = "logs-dev-rg"
+  law_name    = "logs-dev-law"
+
   # Web test config
   web_test_name               = "tfhero-dev-canadacentral-health"
   backend_health_url          = "https://YOUR.PUBLIC.URL/health"
