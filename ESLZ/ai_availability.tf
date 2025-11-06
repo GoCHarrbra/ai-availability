@@ -5,18 +5,11 @@ variable "ai_webtest_alert" {
   description = "All settings for AI/WebTest/ActionGroup/Alert."
 }
 
-# Ensure (or adopt) the target Resource Group
-resource "azurerm_resource_group" "monitoring" {
-  name     = var.ai_webtest_alert.rg_name
-  location = var.ai_webtest_alert.location
-  tags     = try(var.ai_webtest_alert.tags, {})
-}
-
 module "ai_webtest_alert" {
   source = "github.com/GoCHarrbra/ai-availability.git?ref=v0.9.0"
 
   # Placement / naming
-  rg_name         = azurerm_resource_group.monitoring.name
+  rg_name         = module.foundation.rg_name
   location        = var.ai_webtest_alert.location
   resource_prefix = try(var.ai_webtest_alert.resource_prefix, "")
   name_prefix     = var.ai_webtest_alert.name_prefix
@@ -24,8 +17,8 @@ module "ai_webtest_alert" {
   tags            = try(var.ai_webtest_alert.tags, {})
 
   # Existing LAW (reference only)
-  law_rg_name = var.ai_webtest_alert.law_rg_name
-  law_name    = var.ai_webtest_alert.law_name
+  law_rg_name = module.foundation.rg_name
+  law_name    = module.foundation.law_name
 
   # Web test config
   web_test_name               = var.ai_webtest_alert.web_test_name
@@ -45,12 +38,10 @@ module "ai_webtest_alert" {
   # KQL + measure column
   kql_query          = var.ai_webtest_alert.kql_query
   kql_measure_column = var.ai_webtest_alert.kql_measure_column
+  depends_on = [module.foundation]
 }
 
 # Useful outputs for downstream layers
-output "monitoring_rg_name" {
-  value = azurerm_resource_group.monitoring.name
-}
 
 output "web_test_name" {
   value = var.ai_webtest_alert.web_test_name

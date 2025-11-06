@@ -1,5 +1,3 @@
-subscription_id = "00000000-0000-0000-0000-000000000000"
-
 ai_webtest_alert = {
   # Where to put AI/WebTest/AG/Alert
   rg_name  = "monitoring-dev-rg"
@@ -16,10 +14,6 @@ ai_webtest_alert = {
     created_by = "terraform"
     chapter    = "v30_ai_aca_availability"
   }
-
-  # Existing LAW (must already exist)
-  law_rg_name = "logs-dev-rg"
-  law_name    = "logs-dev-law"
 
   # Web test config
   web_test_name               = "tfhero-dev-canadacentral-health"
