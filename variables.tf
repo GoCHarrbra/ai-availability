@@ -13,16 +13,6 @@ variable "resource_prefix" {
   description = "Optional enforced prefix for names. If non-empty, names are 'prefix-ai', 'prefix-ag', and 'prefix-health-kql-alert'."
 }
 
-variable "name_prefix" {
-  type        = string
-  description = "Used for naming when resource_prefix is not provided."
-}
-
-variable "env" {
-  type        = string
-  description = "Environment label (e.g., dev/test/prod). Used for naming when resource_prefix is not provided."
-}
-
 variable "tags" {
   type        = map(string)
   description = "Tags to apply to created resources."

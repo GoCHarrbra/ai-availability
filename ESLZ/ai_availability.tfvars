@@ -1,19 +1,7 @@
-ai_webtest_alert = {
-  # Where to put AI/WebTest/AG/Alert
-  rg_name  = "monitoring-dev-rg"
-  location = "canadacentral"
-
+ai_availability = {
   # Either supply resource_prefix for enforced naming (prefix-ai, prefix-ag, etc.)
   # or rely on name_prefix/env/location below for AI/AG/Alert naming.
   resource_prefix = "monitor"
-
-  name_prefix = "tfhero"
-  env         = "dev"
-
-  tags = {
-    created_by = "terraform"
-    chapter    = "v30_ai_aca_availability"
-  }
 
   # Web test config
   web_test_name               = "tfhero-dev-canadacentral-health"
