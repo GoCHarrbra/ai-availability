@@ -23,7 +23,7 @@ variable "ai_availability" {
 }
 
 module "ai_availability" {
-  source = "github.com/GoCHarrbra/ai-availability.git?ref=v1.0.0"
+  source = "github.com/GoCHarrbra/ai-availability.git?ref=v1.1.0"
   depends_on = [module.foundation]
 
   # Placement / naming
