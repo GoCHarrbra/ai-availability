@@ -1,8 +1,29 @@
-# (Assumes versions.tf + providers.tf live in this folder for Terraform/azurerm setup.)
-
+# All fields required; must be set in ai-availability.tfvars
 variable "ai_webtest_alert" {
-  type        = any
-  description = "All settings for AI/WebTest/ActionGroup/Alert."
+  description = "Settings for AI availability, action group, and alerts."
+  type = object({
+    location                     = string
+    resource_prefix              = string
+    name_prefix                  = string
+    env                          = string
+    tags                         = map(string)
+
+    web_test_name                = string
+    backend_health_url           = string
+    web_test_frequency_seconds   = number
+    web_test_geo_locations       = list(string)
+    web_test_expected_status     = number
+    web_test_expect_text         = string
+    web_test_pass_if_text_found  = bool
+
+    alert_emails                 = list(string)
+    app_name                     = string
+    alert_severity               = number
+    alert_failed_locations_threshold = number
+
+    kql_query                    = string
+    kql_measure_column           = string
+  })
 }
 
 module "ai_webtest_alert" {
@@ -42,7 +63,22 @@ module "ai_webtest_alert" {
 }
 
 # Useful outputs for downstream layers
+output "application_insights_name" {
+  description = "Created Application Insights name."
+  value       = module.ai_webtest_alert.application_insights_name
+}
+
+output "action_group_name" {
+  description = "Created Action Group name."
+  value       = module.ai_webtest_alert.action_group_name
+}
 
 output "web_test_name" {
-  value = var.ai_webtest_alert.web_test_name
+  description = "Created Standard Web Test name."
+  value       = module.ai_webtest_alert.web_test_name
+}
+
+output "alert_name" {
+  description = "Created KQL alert rule name."
+  value       = module.ai_webtest_alert.alert_name
 }
